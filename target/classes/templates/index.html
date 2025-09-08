@@ -1,0 +1,95 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Cash Flow Minimizer</title>
+  <link rel="stylesheet" href="/webjars/bootstrap/5.2.3/css/bootstrap.min.css"/>
+</head>
+<body class="p-4">
+  <div class="container">
+    <h1>Cash Flow Minimizer (Web)</h1>
+    <div class="row mt-4">
+      <div class="col-md-4">
+        <h5>Add Person</h5>
+        <form method="post" action="/person/add">
+          <div class="mb-2">
+            <input class="form-control" name="name" placeholder="Person name" required/>
+          </div>
+          <button class="btn btn-primary">Add</button>
+        </form>
+
+        <hr/>
+        <h5>Add Transaction</h5>
+        <form method="post" action="/transaction/add">
+          <div class="mb-2">
+            <select name="payerId" class="form-select" required>
+              <option value="" disabled selected>-- Payer --</option>
+              <th:block th:each="p : ${people}">
+                <option th:value="${p.id}" th:text="${p.name}"></option>
+              </th:block>
+            </select>
+          </div>
+          <div class="mb-2">
+            <select name="payeeId" class="form-select" required>
+              <option value="" disabled selected>-- Payee --</option>
+              <th:block th:each="p : ${people}">
+                <option th:value="${p.id}" th:text="${p.name}"></option>
+              </th:block>
+            </select>
+          </div>
+          <div class="mb-2">
+            <input class="form-control" name="amount" placeholder="Amount (e.g. 250.00)" required/>
+          </div>
+          <button class="btn btn-success">Add Transaction</button>
+        </form>
+
+        <hr/>
+        <form method="post" action="/compute">
+          <button class="btn btn-warning">Compute Settlements</button>
+        </form>
+        <form method="post" action="/reset" class="mt-2">
+          <button class="btn btn-danger">Reset All (persons & transactions)</button>
+        </form>
+      </div>
+
+      <div class="col-md-8">
+        <h5>People</h5>
+        <table class="table table-sm">
+          <thead><tr><th>ID</th><th>Name</th></tr></thead>
+          <tbody>
+            <th:block th:each="p : ${people}">
+              <tr><td th:text="${p.id}"></td><td th:text="${p.name}"></td></tr>
+            </th:block>
+          </tbody>
+        </table>
+
+        <h5>Transactions</h5>
+        <table class="table table-sm">
+          <thead><tr><th>ID</th><th>Payer</th><th>Payee</th><th>Amount</th></tr></thead>
+          <tbody>
+            <th:block th:each="t : ${transactions}">
+              <tr>
+                <td th:text="${t.id}"></td>
+                <td th:text="${t.payer.name}"></td>
+                <td th:text="${t.payee.name}"></td>
+                <td th:text="${t.amount}"></td>
+              </tr>
+            </th:block>
+          </tbody>
+        </table>
+
+        <h5>Optimized Settlements</h5>
+        <div th:if="${settlements==null}">
+          <p class="text-muted">Press <strong>Compute Settlements</strong> to see optimized payments.</p>
+        </div>
+        <ul th:if="${settlements!=null}" class="list-group">
+          <th:block th:each="s : ${settlements}">
+            <li class="list-group-item" th:text="${s}"></li>
+          </th:block>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <script src="/webjars/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
